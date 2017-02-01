@@ -19,4 +19,3 @@ Options:
  - Choose between 24 hours or 12 hours
  - Choose day/month date order
  - Choose between fahrenheit or celsius
- - Choose to display location or pebble logo
