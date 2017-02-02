@@ -4,6 +4,8 @@ var Clay       = require('./clay');
 var clayConfig = require('./config');
 var clay       = new Clay(clayConfig, null, { autoHandleEvents: false });
 
+var apiKey = '42efb17b4ad3d4a52025106d13376d96';
+
 Pebble.addEventListener('showConfiguration', function(e) {
   Pebble.openURL(clay.generateUrl());
 });
@@ -34,5 +36,33 @@ function restoreSettings() {
 Pebble.on('message', function(event) {
   if (event.data.command === 'settings') {
     restoreSettings();
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      var url = 'http://api.openweathermap.org/data/2.5/weather' +
+        '?lat=' + pos.coords.latitude +
+        '&lon=' + pos.coords.longitude +
+        '&appid=' + apiKey;
+      request(url, 'GET', function(respText) {
+        var apidata = JSON.parse(respText);
+        Pebble.postMessage({
+          'weather': {
+            'location':   apidata.name,
+            'icon':       apidata.weather[0].icon,
+            'temp':       apidata.main.temp
+          }
+        });
+      });
+    });
   }
 });
+
+function request(url, type, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.onload = function (e) {
+    if (xhr.status >= 400 && xhr.status < 600) {
+      return;
+    }
+    callback(this.responseText);
+  };
+  xhr.open(type, url);
+  xhr.send();
+}
