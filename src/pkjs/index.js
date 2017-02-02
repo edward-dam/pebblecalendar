@@ -45,9 +45,9 @@ Pebble.on('message', function(event) {
         var apidata = JSON.parse(respText);
         Pebble.postMessage({
           'weather': {
-            'location':   apidata.name,
-            'icon':       apidata.weather[0].icon,
-            'temp':       apidata.main.temp
+            'name': apidata.name,
+            'icon': apidata.weather[0].icon,
+            'temp': apidata.main.temp
           }
         });
       });

@@ -145,7 +145,7 @@ rocky.on('draw', function(event) {
     drawText(ctx, 'pebble', 'black', 'center', '18px bold Gothic', cx + 0, cy - 82);
   } else {
     if ( api_weather ) {
-      var city = api_weather.location;
+      var city = api_weather.name;
       drawBox(ctx, 'white', cx - 65, cy - 78, 130, 18);
       drawDot(ctx, 'black', cx - 58, cy - 69, 4);
       drawDot(ctx, 'black', cx + 58, cy - 69, 4);
