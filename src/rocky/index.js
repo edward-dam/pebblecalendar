@@ -93,9 +93,9 @@ rocky.on('draw', function(event) {
   drawBox(ctx, 'white', cx + 30, cy + 60, 35,  18);
   
   // Draw Lines
-  drawLine(ctx, 2, 'black', cy - 42, mx);
+  drawLine(ctx, 1, 'black', cy - 42, mx);
   drawLine(ctx, 2, 'black', cy +  0, mx);
-  drawLine(ctx, 2, 'black', cy + 42, mx);
+  drawLine(ctx, 1, 'black', cy + 42, mx);
   
   // Draw Dots
   drawDot(ctx, 'black', cx - 58, cy - 69, 4);
