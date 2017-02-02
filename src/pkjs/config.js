@@ -1,7 +1,7 @@
 //Author: Ed Dam
 
 module.exports = [
-  { "type": "heading", "defaultValue": "Calendar v1.0" },
+  { "type": "heading", "defaultValue": "Calendar v1.1" },
   { "type": "text", "defaultValue": "by Edward Dam" },
   { "type": "section", "items": [
     { "type": "heading", "defaultValue": "Time" },
@@ -15,8 +15,8 @@ module.exports = [
     { "type": "heading", "defaultValue": "Date" },
     { "type": "text", "defaultValue": "Please Choose Date Order" },
     { "type": "radiogroup", "messageKey": "config_date", "options": [
-      { "label": "Day - Month", "value": "daymonth" },
-      { "label": "Month - Day", "value": "monthday" } ],
+      { "label": "DD - MM", "value": "daymonth" },
+      { "label": "MM - DD", "value": "monthday" } ],
     "defaultValue": "daymonth" } ]
   },
   { "type": "section", "items": [
@@ -31,7 +31,7 @@ module.exports = [
     { "type": "heading", "defaultValue": "Location" },
     { "type": "text", "defaultValue": "Please Choose Location or Pebble Logo" },
     { "type": "radiogroup", "messageKey": "config_logo", "options": [
-      { "label": "Location GPS", "value": "location" },
+      { "label": "Location", "value": "location" },
       { "label": "Pebble Logo", "value": "pebble" } ],
     "defaultValue": "location" } ]
   },

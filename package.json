@@ -2,12 +2,12 @@
     "author": "Edward Dam",
     "dependencies": {},
     "keywords": [],
-    "name": "calendar-v1.0",
+    "name": "calendar-v1.1",
     "pebble": {
         "capabilities": [
             "configurable"
         ],
-        "displayName": "Calendar v1.0",
+        "displayName": "Calendar v1.1",
         "enableMultiJS": true,
         "messageKeys": [],
         "projectType": "rocky",
@@ -26,5 +26,5 @@
             "watchface": true
         }
     },
-    "version": "1.0.0"
+    "version": "1.10.0"
 }

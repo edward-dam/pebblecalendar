@@ -113,7 +113,7 @@ rocky.on('draw', function(event) {
   drawText(ctx, dateHour,   'black', 'left', '49px Roboto-subset', cx - 63, cy - 31);
   drawText(ctx, dateMinute, 'black', 'left', '49px Roboto-subset', cx +  7, cy - 31);
 
-  // Draw Date Day-Month
+  // Draw Date
   var dateDay    = new Date().toLocaleDateString(undefined, {day:   'long'});
   var dateDate   = new Date().toLocaleDateString(undefined, {day:   '2-digit'});
   var dateMonth  = new Date().toLocaleDateString(undefined, {month: '2-digit'});
@@ -121,36 +121,31 @@ rocky.on('draw', function(event) {
   var dateLeft;
   var dateRight;
   if ( config_date === "monthday" ) {
-    dateLeft = dateMonth;
+    dateLeft  = dateMonth;
     dateRight = dateDate;
   } else {
-    dateLeft = dateDate;
+    dateLeft  = dateDate;
     dateRight = dateMonth;
   }
-  drawText(ctx, dateDay,   'black', 'center', '24px bold Gothic', cx +  0,  cy - 60);
-  drawText(ctx, dateLeft,  'black', 'left',   '24px bold Gothic', cx - 60,  cy + 25);
-  drawText(ctx, dateRight, 'black', 'left',   '24px bold Gothic', cx - 20,  cy + 25);
-  drawText(ctx, dateYear,  'black', 'left',   '24px bold Gothic', cx + 20,  cy + 25);
+  drawText(ctx, dateDay,   'black', 'center', '24px bold Gothic', cx +  0, cy - 60);
+  drawText(ctx, dateLeft,  'black', 'left',   '24px bold Gothic', cx - 60, cy + 25);
+  drawText(ctx, dateRight, 'black', 'left',   '24px bold Gothic', cx - 20, cy + 25);
+  drawText(ctx, dateYear,  'black', 'left',   '24px bold Gothic', cx + 20, cy + 25);
 
-  // Draw Location/Weather Template
-  drawText(ctx, 'Location', 'black', 'center', '18px bold Gothic', cx +  0,  cy - 82);
-  drawText(ctx, 'Weather',  'black', 'center', '18px bold Gothic', cx - 22,  cy + 56);
-  drawText(ctx, '?°',       'black', 'center', '18px bold Gothic', cx + 49,  cy + 57);
+  // Draw Header Template
+  drawText(ctx, 'pebble',  'black', 'center', '18px bold Gothic', cx +  0, cy - 82);
+
+  // Draw Weather Template
+  drawText(ctx, 'Weather', 'black', 'center', '18px bold Gothic', cx - 22, cy + 56);
+  drawText(ctx, '?°',      'black', 'center', '18px bold Gothic', cx + 49, cy + 57);
   
   // Redraw Location
-  if ( config_logo === "pebble" ) {
+  if ( api_weather && config_logo !== "pebble" ) {
+    var location = api_weather.name;
     drawBox(ctx, 'white', cx - 65, cy - 78, 130, 18);
     drawDot(ctx, 'black', cx - 58, cy - 69, 4);
     drawDot(ctx, 'black', cx + 58, cy - 69, 4);
-    drawText(ctx, 'pebble', 'black', 'center', '18px bold Gothic', cx + 0, cy - 82);
-  } else {
-    if ( api_weather ) {
-      var city = api_weather.name;
-      drawBox(ctx, 'white', cx - 65, cy - 78, 130, 18);
-      drawDot(ctx, 'black', cx - 58, cy - 69, 4);
-      drawDot(ctx, 'black', cx + 58, cy - 69, 4);
-      drawText(ctx, city, 'black', 'center', '18px bold Gothic', cx + 0, cy - 82);
-    }
+    drawText(ctx, location, 'black', 'center', '18px bold Gothic', cx + 0, cy - 82);
   }
 
   // Redraw Weather

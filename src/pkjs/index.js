@@ -51,7 +51,10 @@ Pebble.on('message', function(event) {
           }
         });
       });
-    });
+    }, function(err) {
+      console.error('Error: Cant Retrieve Location');
+    },
+    { timeout: 15000, maximumAge: 60000 });
   }
 });
 
