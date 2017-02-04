@@ -1,30 +1,52 @@
 {
     "author": "Edward Dam",
-    "dependencies": {},
+    "dependencies": {
+        "pebble-clay": "^1.0.0"
+    },
     "keywords": [],
-    "name": "calendar-v1.1",
+    "name": "calendar-v2.0",
     "pebble": {
         "capabilities": [
             "configurable"
         ],
-        "displayName": "Calendar v1.1",
+        "displayName": "Calendar v2.0",
         "enableMultiJS": true,
-        "messageKeys": [],
-        "projectType": "rocky",
+        "messageKeys": [
+            "LOCATION",
+            "WEATHER",
+            "HOUR",
+            "DATE",
+            "DEGREE",
+            "LOGO",
+            "TEMP_CEL",
+            "TEMP_FAH"
+        ],
+        "projectType": "native",
         "resources": {
-            "media": []
+            "media": [
+                {
+                    "file": "images/menu_icon.png",
+                    "menuIcon": true,
+                    "name": "MENU_ICON",
+                    "targetPlatforms": [
+                        "aplite",
+                        "basalt",
+                        "chalk",
+                        "diorite",
+                        "emery"
+                    ],
+                    "type": "bitmap"
+                }
+            ]
         },
         "sdkVersion": "3",
         "targetPlatforms": [
-            "basalt",
-            "chalk",
-            "diorite",
-            "emery"
+            "basalt"
         ],
         "uuid": "1d8518dc-729a-4763-b1e2-db42c3ec59f2",
         "watchapp": {
             "watchface": true
         }
     },
-    "version": "1.11.0"
+    "version": "2.0.0"
 }
