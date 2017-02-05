@@ -2,12 +2,11 @@
 
 //APP_LOG(APP_LOG_LEVEL_DEBUG, "LOG MESSAGE");
 
-// definitions
+// window layers
 static Window *main_window;
 static Layer *canvas_layer;
 static TextLayer *logo_layer;
 static TextLayer *day_layer;
-static TextLayer *battery_layer;
 static TextLayer *hour_layer;
 static TextLayer *mins_layer;
 static TextLayer *date_layer;
@@ -15,6 +14,11 @@ static TextLayer *month_layer;
 static TextLayer *year_layer;
 static TextLayer *weather_layer;
 static TextLayer *temperature_layer;
+
+// battery level
+static int battery_level;
+static Layer *battery_layer;
+static TextLayer *battery_percentage;
 
 // saved settings
 uint32_t hour_setting   = 0;
@@ -26,7 +30,7 @@ bool date_bool;
 bool degree_bool;
 bool logo_bool;
 
-// saved date/time
+// load date/time
 static char hour12_buffer[3];
 static char hour24_buffer[3];
 static char datedd_buffer[3];
@@ -34,7 +38,7 @@ static char datemm_buffer[3];
 static char monthmm_buffer[3];
 static char monthdd_buffer[3];
 
-// saved weather
+// load weather
 static char location_buffer[13];
 static char weather_buffer[11];
 static char temp_cel_buffer[5];
@@ -53,7 +57,6 @@ static void load_options() {
       hour_bool = false;
       text_layer_set_text(hour_layer, hour24_buffer);
     }
-    
   } else {
     hour_bool = false;
   }
@@ -151,6 +154,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     snprintf(weather_buffer, sizeof(weather_buffer), "%s", weather_tuple->value->cstring);
     text_layer_set_text(weather_layer, weather_buffer);
   }
+
   // display temperature
   if (temp_cel_tuple && temp_fah_tuple) {
     snprintf(temp_fah_buffer, sizeof(temp_fah_buffer), "%d°", (int)temp_fah_tuple->value->int32);
@@ -161,6 +165,34 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
       text_layer_set_text(temperature_layer, temp_cel_buffer);
     } 
   }
+}
+
+// collect battery level
+static void battery_callback(BatteryChargeState state) {
+  battery_level = state.charge_percent;
+  layer_mark_dirty(battery_layer);
+}
+
+// draw battery level
+static void battery_update_proc(Layer *layer, GContext *ctx) {
+  // get canvas size
+  GRect bounds = layer_get_bounds(layer);
+  //int mx = bounds.size.w;
+  int my = bounds.size.h;
+  int cx = bounds.size.w/2;
+  int cy = bounds.size.h/2;
+  
+  // collect battery level
+  static char battery_buffer[5];
+  snprintf(battery_buffer, sizeof(battery_buffer), "%d%%", (int8_t)battery_level);
+
+  // display battery percentage
+  battery_percentage = text_layer_create(GRect(cx+35,cy-52,30,my));
+  text_layer_set_background_color(battery_percentage, GColorClear);
+  text_layer_set_text_alignment(battery_percentage, GTextAlignmentCenter);
+  text_layer_set_font(battery_percentage, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
+  text_layer_set_text(battery_percentage, battery_buffer);
+  layer_add_child(layer, text_layer_get_layer(battery_percentage));
 }
 
 // update date/time
@@ -316,6 +348,12 @@ static void main_window_load(Window *window) {
   layer_set_update_proc(canvas_layer, canvas_update_proc);
   layer_add_child(window_get_root_layer(window), canvas_layer);
   
+  // battery layer
+  battery_layer = layer_create(bounds);
+  layer_set_update_proc(battery_layer, battery_update_proc);
+  layer_add_child(window_get_root_layer(window), battery_layer);
+  battery_callback(battery_state_service_peek());
+  
   // logo/location layer
   logo_layer = text_layer_create(GRect(0,cy-82,mx,my));
   text_layer_set_background_color(logo_layer, GColorClear);
@@ -323,14 +361,6 @@ static void main_window_load(Window *window) {
   text_layer_set_font(logo_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
   text_layer_set_text(logo_layer, "pebble");
   layer_add_child(window_layer, text_layer_get_layer(logo_layer));
-  
-  // battery layer
-  battery_layer = text_layer_create(GRect(cx+35,cy-52,30,my));
-  text_layer_set_background_color(battery_layer, GColorClear);
-  text_layer_set_text_alignment(battery_layer, GTextAlignmentCenter);
-  text_layer_set_font(battery_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
-  text_layer_set_text(battery_layer, "90%");
-  layer_add_child(window_layer, text_layer_get_layer(battery_layer));
 
   // time layers
   hour_layer = text_layer_create(GRect(cx-50,cy-13,mx,my));
@@ -388,10 +418,11 @@ static void main_window_unload(Window *window) {
   text_layer_destroy(date_layer);
   text_layer_destroy(mins_layer);
   text_layer_destroy(hour_layer);
-  text_layer_destroy(battery_layer);
+  text_layer_destroy(battery_percentage);
   text_layer_destroy(day_layer);
   text_layer_destroy(logo_layer);
-  // destroy canvas layer
+  // destroy canvas layers
+  layer_destroy(battery_layer);
   layer_destroy(canvas_layer);
 }
 
@@ -416,6 +447,9 @@ static void init() {
   // update date/time
   update_datetime();
   tick_timer_service_subscribe(MINUTE_UNIT, mins_tick_handler);
+  
+  // update battery level
+  battery_state_service_subscribe(battery_callback);
   
   // update options/weather
   app_message_register_inbox_received(inbox_received_callback);
