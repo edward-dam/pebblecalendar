@@ -2,6 +2,7 @@
 ###screenshots
 
 ![basalt.png](/assets/basalt.png)
+![basalt-health.png](/assets/basalt-health.png)
 
 ###banner
 
@@ -14,7 +15,8 @@ https://apps.getpebble.com/applications/58927b1693254a93d00005b1
 ###description
 <br />
 Simple calendar style watchface, includes:
- - location
+ - current location
+ - steps for the day
  - battery percentage
  - current weather
  - current temperature
@@ -26,4 +28,4 @@ Options:
  - Choose between 24 hours or 12 hours
  - Choose day/month date order
  - Choose between fahrenheit or celsius
- - Choose between location or pebble logo
+ - Choose between location, steps or logo
