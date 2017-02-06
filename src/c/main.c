@@ -23,6 +23,7 @@ static TextLayer *battery_percentage;
 // bluetooth icon
 static BitmapLayer *bt_icon_layer;
 static GBitmap *bt_icon_bitmap;
+bool bt_startup = true;
 
 // saved settings
 uint32_t hour_setting   = 0;
@@ -174,9 +175,10 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 // bluetooth connection change
 static void bluetooth_callback(bool connected) {
   layer_set_hidden(bitmap_layer_get_layer(bt_icon_layer), connected);
-  if(!connected) {
+  if(!bt_startup) {
     vibes_double_pulse();
   }
+  bt_startup = false;
 }
 
 // collect battery level
@@ -418,7 +420,7 @@ static void main_window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(weather_layer));
   layer_add_child(window_layer, text_layer_get_layer(temperature_layer));
   
-  // Bluetooth Layer
+  // bluetooth Layer
   bt_icon_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BT_ICON);
   bt_icon_layer = bitmap_layer_create(GRect(cx+30,cy+60,35,18));
   bitmap_layer_set_bitmap(bt_icon_layer, bt_icon_bitmap);
