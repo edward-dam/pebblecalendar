@@ -25,6 +25,12 @@ static BitmapLayer *bt_icon_layer;
 static GBitmap *bt_icon_bitmap;
 bool bt_startup = true;
 
+// health events
+static BitmapLayer *steps_icon_layer;
+static GBitmap *steps_icon_bitmap;
+static char steps_buffer[12];
+bool steps_bool;
+
 // saved settings
 uint32_t hour_setting   = 0;
 uint32_t date_setting   = 1;
@@ -108,15 +114,33 @@ static void load_options() {
     persist_read_string(logo_setting, logo_buffer, sizeof(logo_buffer));
     if (strcmp(logo_buffer, "true") == 0) {
       logo_bool = true;
+      layer_insert_below_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
       text_layer_set_text(logo_layer, "pebble");
     } else {
       logo_bool = false;
-      if (strlen(location_buffer) != 0 ) {
-        text_layer_set_text(logo_layer, location_buffer);
-      } 
+      if (strcmp(logo_buffer, "step") == 0) {
+        steps_bool = true;
+        if (strlen(steps_buffer) != 0 ) {
+          layer_insert_above_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
+          text_layer_set_text(logo_layer, steps_buffer);
+        } else {
+          layer_insert_below_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
+          text_layer_set_text(logo_layer, "pebble");
+        }
+      } else {
+        steps_bool = false;
+        if (strlen(location_buffer) != 0 ) {
+          layer_insert_below_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
+          text_layer_set_text(logo_layer, location_buffer);
+        } else {
+          layer_insert_below_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
+          text_layer_set_text(logo_layer, "pebble");
+        }
+      }
     }
   } else {
     logo_bool = false;
+    steps_bool = false;
   }
 }
 
@@ -150,7 +174,8 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   // display location
   if (location_tuple) {
     snprintf(location_buffer, sizeof(location_buffer), "%s", location_tuple->value->cstring);
-    if (!logo_bool) {
+    if (!logo_bool && !steps_bool) {
+      layer_insert_below_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
       text_layer_set_text(logo_layer, location_buffer);
     }
   }
@@ -171,6 +196,19 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     } 
   }
 }
+
+// health event changed
+#if defined(PBL_HEALTH)
+  static void health_handler(HealthEventType event, void *context) {
+    if (event == HealthEventMovementUpdate) {
+      snprintf(steps_buffer, sizeof(steps_buffer), "      %d", (int)health_service_sum_today(HealthMetricStepCount));
+      if (steps_bool) {
+        layer_insert_above_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
+        text_layer_set_text(logo_layer, steps_buffer);
+      }
+    }
+  }
+#endif
 
 // bluetooth connection change
 static void bluetooth_callback(bool connected) {
@@ -420,19 +458,37 @@ static void main_window_load(Window *window) {
   layer_add_child(window_layer, text_layer_get_layer(weather_layer));
   layer_add_child(window_layer, text_layer_get_layer(temperature_layer));
   
-  // bluetooth Layer
+  // bluetooth layer
   bt_icon_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BT_ICON);
   bt_icon_layer = bitmap_layer_create(GRect(cx+30,cy+60,35,18));
   bitmap_layer_set_bitmap(bt_icon_layer, bt_icon_bitmap);
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bt_icon_layer));
   bluetooth_callback(connection_service_peek_pebble_app_connection());
+  
+  // health layer
+  steps_icon_bitmap = gbitmap_create_with_resource(RESOURCE_ID_STEPS_ICON);
+  steps_icon_layer = bitmap_layer_create(GRect(cx-30,cy-78,18,18));
+  bitmap_layer_set_bitmap(steps_icon_layer, steps_icon_bitmap);
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(steps_icon_layer));
+  layer_insert_below_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
+  #if defined(PBL_HEALTH)
+    if(health_service_events_subscribe(health_handler, NULL)) {
+      health_handler(HealthEventMovementUpdate, NULL);
+    }
+  #endif
 }
 
 // window unload
 static void main_window_unload(Window *window) {
+  // unsubscribe from events
+  #if defined(PBL_HEALTH)
+    health_service_events_unsubscribe();
+  #endif
   // destroy image layers
   gbitmap_destroy(bt_icon_bitmap);
+  gbitmap_destroy(steps_icon_bitmap);
   bitmap_layer_destroy(bt_icon_layer);
+  bitmap_layer_destroy(steps_icon_layer);
   // destroy text layers
   text_layer_destroy(temperature_layer);
   text_layer_destroy(weather_layer);
@@ -481,11 +537,16 @@ static void init() {
 
   // update options/weather
   app_message_register_inbox_received(inbox_received_callback);
-  app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
+  app_message_open(64,0);  
 }
 
 // deinit
 static void deinit() {
+  // unsubscribe from events
+  connection_service_unsubscribe();
+  battery_state_service_unsubscribe();
+  tick_timer_service_unsubscribe();
+  // destroy window
   window_destroy(main_window);
 }
 

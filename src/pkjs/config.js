@@ -1,7 +1,7 @@
 //Author: Ed Dam
 
 module.exports = [
-  { "type": "heading", "defaultValue": "Calendar v2.1" },
+  { "type": "heading", "defaultValue": "Calendar v2.2" },
   { "type": "text", "defaultValue": "by Edward Dam" },
   { "type": "section", "items": [
     { "type": "heading", "defaultValue": "Time" },
@@ -27,12 +27,21 @@ module.exports = [
       { "label": "Celsius °C", "value": "true" } ],
     "defaultValue": "false" } ]
   },
-  { "type": "section", "items": [
-    { "type": "heading", "defaultValue": "Location" },
-    { "type": "text", "defaultValue": "Please Choose Location or Pebble Logo" },
+  { "type": "section", "capabilities": ["HEALTH"], "items": [
+    { "type": "heading", "defaultValue": "Location & Health" },
+    { "type": "text", "defaultValue": "Please Choose Header Display" },
     { "type": "radiogroup", "messageKey": "LOGO", "options": [
       { "label": "Location", "value": "false" },
-      { "label": "Pebble Logo", "value": "true" } ],
+      { "label": "Steps", "value": "steps" },
+      { "label": "Pebble Brand", "value": "true" } ],
+    "defaultValue": "false" } ]
+  },
+  { "type": "section", "capabilities": ["NOT_HEALTH"], "items": [
+    { "type": "heading", "defaultValue": "Location" },
+    { "type": "text", "defaultValue": "Please Choose Location or Brand" },
+    { "type": "radiogroup", "messageKey": "LOGO", "options": [
+      { "label": "Location", "value": "false" },
+      { "label": "Pebble Brand", "value": "true" } ],
     "defaultValue": "false" } ]
   },
   { "type": "text", "defaultValue": "Thank you for using my watchface." },
