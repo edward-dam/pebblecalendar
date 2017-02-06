@@ -1,7 +1,7 @@
 //Author: Ed Dam
 
 module.exports = [
-  { "type": "heading", "defaultValue": "Calendar v2.0" },
+  { "type": "heading", "defaultValue": "Calendar v2.1" },
   { "type": "text", "defaultValue": "by Edward Dam" },
   { "type": "section", "items": [
     { "type": "heading", "defaultValue": "Time" },

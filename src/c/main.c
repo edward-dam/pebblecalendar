@@ -20,6 +20,10 @@ static int battery_level;
 static Layer *battery_layer;
 static TextLayer *battery_percentage;
 
+// bluetooth icon
+static BitmapLayer *bt_icon_layer;
+static GBitmap *bt_icon_bitmap;
+
 // saved settings
 uint32_t hour_setting   = 0;
 uint32_t date_setting   = 1;
@@ -167,6 +171,14 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   }
 }
 
+// bluetooth connection change
+static void bluetooth_callback(bool connected) {
+  layer_set_hidden(bitmap_layer_get_layer(bt_icon_layer), connected);
+  if(!connected) {
+    vibes_double_pulse();
+  }
+}
+
 // collect battery level
 static void battery_callback(BatteryChargeState state) {
   battery_level = state.charge_percent;
@@ -177,7 +189,6 @@ static void battery_callback(BatteryChargeState state) {
 static void battery_update_proc(Layer *layer, GContext *ctx) {
   // get canvas size
   GRect bounds = layer_get_bounds(layer);
-  //int mx = bounds.size.w;
   int my = bounds.size.h;
   int cx = bounds.size.w/2;
   int cy = bounds.size.h/2;
@@ -347,13 +358,7 @@ static void main_window_load(Window *window) {
   canvas_layer = layer_create(bounds);
   layer_set_update_proc(canvas_layer, canvas_update_proc);
   layer_add_child(window_get_root_layer(window), canvas_layer);
-  
-  // battery layer
-  battery_layer = layer_create(bounds);
-  layer_set_update_proc(battery_layer, battery_update_proc);
-  layer_add_child(window_get_root_layer(window), battery_layer);
-  battery_callback(battery_state_service_peek());
-  
+
   // logo/location layer
   logo_layer = text_layer_create(GRect(0,cy-82,mx,my));
   text_layer_set_background_color(logo_layer, GColorClear);
@@ -361,6 +366,12 @@ static void main_window_load(Window *window) {
   text_layer_set_font(logo_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
   text_layer_set_text(logo_layer, "pebble");
   layer_add_child(window_layer, text_layer_get_layer(logo_layer));
+  
+  // battery layer
+  battery_layer = layer_create(bounds);
+  layer_set_update_proc(battery_layer, battery_update_proc);
+  layer_add_child(window_get_root_layer(window), battery_layer);
+  battery_callback(battery_state_service_peek());
 
   // time layers
   hour_layer = text_layer_create(GRect(cx-50,cy-13,mx,my));
@@ -406,10 +417,20 @@ static void main_window_load(Window *window) {
   text_layer_set_text(temperature_layer, "?°");
   layer_add_child(window_layer, text_layer_get_layer(weather_layer));
   layer_add_child(window_layer, text_layer_get_layer(temperature_layer));
+  
+  // Bluetooth Layer
+  bt_icon_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BT_ICON);
+  bt_icon_layer = bitmap_layer_create(GRect(cx+30,cy+60,35,18));
+  bitmap_layer_set_bitmap(bt_icon_layer, bt_icon_bitmap);
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bt_icon_layer));
+  bluetooth_callback(connection_service_peek_pebble_app_connection());
 }
 
 // window unload
 static void main_window_unload(Window *window) {
+  // destroy image layers
+  gbitmap_destroy(bt_icon_bitmap);
+  bitmap_layer_destroy(bt_icon_layer);
   // destroy text layers
   text_layer_destroy(temperature_layer);
   text_layer_destroy(weather_layer);
@@ -451,6 +472,11 @@ static void init() {
   // update battery level
   battery_state_service_subscribe(battery_callback);
   
+  // check bluetooth connection
+  connection_service_subscribe((ConnectionHandlers) {
+    .pebble_app_connection_handler = bluetooth_callback
+  });
+
   // update options/weather
   app_message_register_inbox_received(inbox_received_callback);
   app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
