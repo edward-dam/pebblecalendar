@@ -3,6 +3,7 @@
 
 ![basalt.png](/assets/basalt.png)
 ![basalt-health.png](/assets/basalt-health.png)
+![basalt-sleep.png](/assets/basalt-sleep.png)
 
 ###banner
 
@@ -16,7 +17,7 @@ https://apps.getpebble.com/applications/58927b1693254a93d00005b1
 <br />
 Simple calendar style watchface, includes:
  - current location
- - steps for the day
+ - steps/sleep data
  - battery percentage
  - current weather
  - current temperature
