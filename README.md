@@ -29,4 +29,4 @@ Options:
  - Choose between 24 hours or 12 hours
  - Choose day/month date order
  - Choose between fahrenheit or celsius
- - Choose between location, steps or brand
+ - Choose between location, health or brand
