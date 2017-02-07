@@ -1,7 +1,7 @@
 //Author: Ed Dam
 
 module.exports = [
-  { "type": "heading", "defaultValue": "Calendar v2.2" },
+  { "type": "heading", "defaultValue": "Calendar v2.3" },
   { "type": "text", "defaultValue": "by Edward Dam" },
   { "type": "section", "items": [
     { "type": "heading", "defaultValue": "Time" },
@@ -30,16 +30,16 @@ module.exports = [
   { "type": "section", "capabilities": ["HEALTH"], "items": [
     { "type": "heading", "defaultValue": "Location & Health" },
     { "type": "text", "defaultValue": "Please Choose Header Display" },
-    { "type": "radiogroup", "messageKey": "LOGO", "options": [
+    { "type": "radiogroup", "messageKey": "BRAND", "options": [
       { "label": "Location", "value": "false" },
-      { "label": "Steps", "value": "steps" },
+      { "label": "Steps/Sleep", "value": "step" },
       { "label": "Pebble Brand", "value": "true" } ],
     "defaultValue": "false" } ]
   },
   { "type": "section", "capabilities": ["NOT_HEALTH"], "items": [
     { "type": "heading", "defaultValue": "Location" },
     { "type": "text", "defaultValue": "Please Choose Location or Brand" },
-    { "type": "radiogroup", "messageKey": "LOGO", "options": [
+    { "type": "radiogroup", "messageKey": "BRAND", "options": [
       { "label": "Location", "value": "false" },
       { "label": "Pebble Brand", "value": "true" } ],
     "defaultValue": "false" } ]

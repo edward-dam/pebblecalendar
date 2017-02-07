@@ -4,14 +4,14 @@
         "pebble-clay": "^1.0.0"
     },
     "keywords": [],
-    "name": "calendar-v2.2",
+    "name": "calendar-v2.3",
     "pebble": {
         "capabilities": [
             "location",
             "configurable",
             "health"
         ],
-        "displayName": "Calendar v2.2",
+        "displayName": "Calendar v2.3",
         "enableMultiJS": true,
         "messageKeys": [
             "LOCATION",
@@ -19,7 +19,7 @@
             "HOUR",
             "DATE",
             "DEGREE",
-            "LOGO",
+            "BRAND",
             "TEMP_CEL",
             "TEMP_FAH"
         ],
@@ -78,5 +78,5 @@
             "watchface": true
         }
     },
-    "version": "2.20.0"
+    "version": "2.30.0"
 }

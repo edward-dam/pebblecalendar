@@ -5,7 +5,7 @@
 // window layers
 static Window *main_window;
 static Layer *canvas_layer;
-static TextLayer *logo_layer;
+static TextLayer *brand_layer;
 static TextLayer *day_layer;
 static TextLayer *hour_layer;
 static TextLayer *mins_layer;
@@ -29,17 +29,19 @@ bool bt_startup = true;
 static BitmapLayer *steps_icon_layer;
 static GBitmap *steps_icon_bitmap;
 static char steps_buffer[12];
-bool steps_bool;
+static char sleep_buffer[11];
+bool health_bool;
+bool sleep_bool;
 
 // saved settings
 uint32_t hour_setting   = 0;
 uint32_t date_setting   = 1;
 uint32_t degree_setting = 2;
-uint32_t logo_setting   = 3;
+uint32_t brand_setting  = 3;
 bool hour_bool;
 bool date_bool;
 bool degree_bool;
-bool logo_bool;
+bool brand_bool;
 
 // load date/time
 static char hour12_buffer[3];
@@ -108,39 +110,49 @@ static void load_options() {
     degree_bool = false;
   }
 
-  // load location or logo
-  if (persist_exists(logo_setting)) {
-    char logo_buffer[5];
-    persist_read_string(logo_setting, logo_buffer, sizeof(logo_buffer));
-    if (strcmp(logo_buffer, "true") == 0) {
-      logo_bool = true;
+  // load location, health or brand
+  if (persist_exists(brand_setting)) {
+    char brand_buffer[5];
+    persist_read_string(brand_setting, brand_buffer, sizeof(brand_buffer));
+    if (strcmp(brand_buffer, "true") == 0) {
+      brand_bool = true;
       layer_insert_below_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
-      text_layer_set_text(logo_layer, "pebble");
+      text_layer_set_text(brand_layer, "pebble");
     } else {
-      logo_bool = false;
-      if (strcmp(logo_buffer, "step") == 0) {
-        steps_bool = true;
-        if (strlen(steps_buffer) != 0 ) {
-          layer_insert_above_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
-          text_layer_set_text(logo_layer, steps_buffer);
+      brand_bool = false;
+      if (strcmp(brand_buffer, "step") == 0) {
+        health_bool = true;
+        if (sleep_bool) {
+          if (strlen(sleep_buffer) != 0 ) {
+            layer_insert_below_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
+            text_layer_set_text(brand_layer, sleep_buffer);
+          } else {
+            layer_insert_below_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
+            text_layer_set_text(brand_layer, "pebble");
+          }
         } else {
-          layer_insert_below_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
-          text_layer_set_text(logo_layer, "pebble");
+          if (strlen(steps_buffer) != 0 ) {
+            layer_insert_above_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
+            text_layer_set_text(brand_layer, steps_buffer);
+          } else {
+            layer_insert_below_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
+            text_layer_set_text(brand_layer, "pebble");
+          }
         }
       } else {
-        steps_bool = false;
+        health_bool = false;
         if (strlen(location_buffer) != 0 ) {
           layer_insert_below_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
-          text_layer_set_text(logo_layer, location_buffer);
+          text_layer_set_text(brand_layer, location_buffer);
         } else {
           layer_insert_below_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
-          text_layer_set_text(logo_layer, "pebble");
+          text_layer_set_text(brand_layer, "pebble");
         }
       }
     }
   } else {
-    logo_bool = false;
-    steps_bool = false;
+    brand_bool = false;
+    health_bool = false;
   }
 }
 
@@ -150,18 +162,18 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   Tuple *hour_tuple   = dict_find(iterator, MESSAGE_KEY_HOUR);
   Tuple *date_tuple   = dict_find(iterator, MESSAGE_KEY_DATE);
   Tuple *degree_tuple = dict_find(iterator, MESSAGE_KEY_DEGREE);
-  Tuple *logo_tuple   = dict_find(iterator, MESSAGE_KEY_LOGO);
+  Tuple *brand_tuple  = dict_find(iterator, MESSAGE_KEY_BRAND);
 
   // save options
-  if(hour_tuple && date_tuple && degree_tuple && logo_tuple) {
+  if(hour_tuple && date_tuple && degree_tuple && brand_tuple) {
     char *hour_string   = hour_tuple->value->cstring;
     char *date_string   = date_tuple->value->cstring;
     char *degree_string = degree_tuple->value->cstring;
-    char *logo_string   = logo_tuple->value->cstring;
+    char *brand_string  = brand_tuple->value->cstring;
     persist_write_string(hour_setting,   hour_string);
     persist_write_string(date_setting,   date_string);
     persist_write_string(degree_setting, degree_string);
-    persist_write_string(logo_setting,   logo_string);
+    persist_write_string(brand_setting,  brand_string);
     load_options();
   }
 
@@ -174,9 +186,9 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   // display location
   if (location_tuple) {
     snprintf(location_buffer, sizeof(location_buffer), "%s", location_tuple->value->cstring);
-    if (!logo_bool && !steps_bool) {
+    if (!brand_bool && !health_bool) {
       layer_insert_below_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
-      text_layer_set_text(logo_layer, location_buffer);
+      text_layer_set_text(brand_layer, location_buffer);
     }
   }
   // display weather
@@ -201,10 +213,28 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 #if defined(PBL_HEALTH)
   static void health_handler(HealthEventType event, void *context) {
     if (event == HealthEventMovementUpdate) {
+      sleep_bool = false;
       snprintf(steps_buffer, sizeof(steps_buffer), "      %d", (int)health_service_sum_today(HealthMetricStepCount));
-      if (steps_bool) {
+      if (health_bool) {
         layer_insert_above_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
-        text_layer_set_text(logo_layer, steps_buffer);
+        text_layer_set_text(brand_layer, steps_buffer);
+      }
+    } else if (event == HealthEventSleepUpdate) {
+      sleep_bool = true;
+      static int seconds, minutes, hours, remainder;
+      static char mins_buffer[4], hour_buffer[4];
+      seconds = (int)health_service_sum_today(HealthMetricSleepSeconds);
+      hours = seconds / 3600;
+      remainder = seconds % 3600;
+      minutes = remainder / 60;
+      snprintf(hour_buffer, sizeof(hour_buffer), "%dh", (int)hours);
+      snprintf(mins_buffer, sizeof(mins_buffer), "%dm", (int)minutes);
+      snprintf(sleep_buffer, sizeof(sleep_buffer), "zZz %s", hour_buffer);
+      int length = strlen(sleep_buffer);
+      snprintf(sleep_buffer+length, (sizeof sleep_buffer) - length, "%s", mins_buffer);
+      if (health_bool) {
+        layer_insert_below_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
+        text_layer_set_text(brand_layer, sleep_buffer);
       }
     }
   }
@@ -303,7 +333,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_context_set_fill_color(ctx, GColorWhite);
  
   // draw boxes
-  GRect logo_square = GRect(cx-65,cy-78,130,18);
+  GRect head_square = GRect(cx-65,cy-78,130,18);
   GRect day_square  = GRect(cx-65,cy-55,88, 25);
   GRect batt_header = GRect(cx+30,cy-50,10, 15);
   GRect batt_square = GRect(cx+35,cy-55,30, 25);
@@ -314,7 +344,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   GRect year_square = GRect(cx+15,cy+30,50, 25);
   GRect weat_square = GRect(cx-65,cy+60,85, 18);
   GRect temp_square = GRect(cx+30,cy+60,35, 18);
-  graphics_draw_rect(ctx, logo_square);
+  graphics_draw_rect(ctx, head_square);
   graphics_draw_rect(ctx, day_square);
   graphics_draw_rect(ctx, batt_header);
   graphics_draw_rect(ctx, batt_square);
@@ -325,7 +355,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   graphics_draw_rect(ctx, year_square);
   graphics_draw_rect(ctx, weat_square);
   graphics_draw_rect(ctx, temp_square);
-  graphics_fill_rect(ctx, logo_square, 0, GCornersAll);
+  graphics_fill_rect(ctx, head_square, 0, GCornersAll);
   graphics_fill_rect(ctx, day_square,  1, GCornersAll);
   graphics_fill_rect(ctx, batt_header, 1, GCornersAll);
   graphics_fill_rect(ctx, batt_square, 1, GCornersAll);
@@ -399,13 +429,13 @@ static void main_window_load(Window *window) {
   layer_set_update_proc(canvas_layer, canvas_update_proc);
   layer_add_child(window_get_root_layer(window), canvas_layer);
 
-  // logo/location layer
-  logo_layer = text_layer_create(GRect(0,cy-82,mx,my));
-  text_layer_set_background_color(logo_layer, GColorClear);
-  text_layer_set_text_alignment(logo_layer, GTextAlignmentCenter);
-  text_layer_set_font(logo_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
-  text_layer_set_text(logo_layer, "pebble");
-  layer_add_child(window_layer, text_layer_get_layer(logo_layer));
+  // brand layer
+  brand_layer = text_layer_create(GRect(0,cy-82,mx,my));
+  text_layer_set_background_color(brand_layer, GColorClear);
+  text_layer_set_text_alignment(brand_layer, GTextAlignmentCenter);
+  text_layer_set_font(brand_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
+  text_layer_set_text(brand_layer, "pebble");
+  layer_add_child(window_layer, text_layer_get_layer(brand_layer));
   
   // battery layer
   battery_layer = layer_create(bounds);
@@ -473,7 +503,14 @@ static void main_window_load(Window *window) {
   layer_insert_below_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
   #if defined(PBL_HEALTH)
     if(health_service_events_subscribe(health_handler, NULL)) {
-      health_handler(HealthEventMovementUpdate, NULL);
+      HealthActivityMask activities = health_service_peek_current_activities();
+      if((activities & HealthActivitySleep) || (activities & HealthActivityRestfulSleep)) {
+        sleep_bool = true;
+        health_handler(HealthEventSleepUpdate, NULL);
+      } else {
+        sleep_bool = false;
+        health_handler(HealthEventMovementUpdate, NULL);
+      }
     }
   #endif
 }
@@ -499,7 +536,7 @@ static void main_window_unload(Window *window) {
   text_layer_destroy(hour_layer);
   text_layer_destroy(battery_percentage);
   text_layer_destroy(day_layer);
-  text_layer_destroy(logo_layer);
+  text_layer_destroy(brand_layer);
   // destroy canvas layers
   layer_destroy(battery_layer);
   layer_destroy(canvas_layer);
