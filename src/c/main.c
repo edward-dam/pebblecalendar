@@ -505,10 +505,8 @@ static void main_window_load(Window *window) {
     if(health_service_events_subscribe(health_handler, NULL)) {
       HealthActivityMask activities = health_service_peek_current_activities();
       if((activities & HealthActivitySleep) || (activities & HealthActivityRestfulSleep)) {
-        sleep_bool = true;
         health_handler(HealthEventSleepUpdate, NULL);
       } else {
-        sleep_bool = false;
         health_handler(HealthEventMovementUpdate, NULL);
       }
     }
