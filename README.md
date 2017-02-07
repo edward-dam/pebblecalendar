@@ -4,6 +4,7 @@
 ![basalt.png](/assets/basalt.png)
 ![basalt-health.png](/assets/basalt-health.png)
 ![basalt-sleep.png](/assets/basalt-sleep.png)
+![basalt-sleep.png](/assets/basalt-bluetooth.png)
 
 ###banner
 
