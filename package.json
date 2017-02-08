@@ -4,14 +4,14 @@
         "pebble-clay": "^1.0.0"
     },
     "keywords": [],
-    "name": "calendar-v2.3",
+    "name": "calendar-v3.0",
     "pebble": {
         "capabilities": [
             "location",
             "configurable",
             "health"
         ],
-        "displayName": "Calendar v2.3",
+        "displayName": "Calendar v3.0",
         "enableMultiJS": true,
         "messageKeys": [
             "LOCATION",
@@ -21,7 +21,8 @@
             "DEGREE",
             "BRAND",
             "TEMP_CEL",
-            "TEMP_FAH"
+            "TEMP_FAH",
+            "HEALTH"
         ],
         "projectType": "native",
         "resources": {
@@ -33,8 +34,7 @@
                         "aplite",
                         "basalt",
                         "chalk",
-                        "diorite",
-                        "emery"
+                        "diorite"
                     ],
                     "type": "bitmap"
                 },
@@ -45,8 +45,7 @@
                         "aplite",
                         "basalt",
                         "chalk",
-                        "diorite",
-                        "emery"
+                        "diorite"
                     ],
                     "type": "bitmap"
                 },
@@ -58,8 +57,7 @@
                         "aplite",
                         "basalt",
                         "chalk",
-                        "diorite",
-                        "emery"
+                        "diorite"
                     ],
                     "type": "bitmap"
                 }
@@ -70,13 +68,12 @@
             "aplite",
             "basalt",
             "chalk",
-            "diorite",
-            "emery"
+            "diorite"
         ],
         "uuid": "1d8518dc-729a-4763-b1e2-db42c3ec59f2",
         "watchapp": {
             "watchface": true
         }
     },
-    "version": "2.30.0"
+    "version": "3.0.0"
 }
