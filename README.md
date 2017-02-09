@@ -17,13 +17,15 @@ https://apps.getpebble.com/applications/58927b1693254a93d00005b1
 ###description
 <br />
 Simple calendar style watchface, includes:
- - time and date
  - current location
+ - day of the week
  - battery percentage
+ - time and date
  - current weather
  - current temperature
- - current steps/sleep data
- - bluetooth disconnection symbol<br />
+ - steps data
+ - sleep data
+ - bluetooth symbol<br />
 <br />
 
 Options:
