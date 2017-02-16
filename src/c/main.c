@@ -208,6 +208,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
       text_layer_set_text(brand_layer, location_buffer);
     }
   }
+
   // display weather
   if (weather_tuple) {
     snprintf(weather_buffer, sizeof(weather_buffer), "%s", weather_tuple->value->cstring);
@@ -446,7 +447,7 @@ static void main_window_load(Window *window) {
   // drawing canvas
   canvas_layer = layer_create(bounds);
   layer_set_update_proc(canvas_layer, canvas_update_proc);
-  layer_add_child(window_get_root_layer(window), canvas_layer);
+  layer_add_child(window_layer, canvas_layer);
 
   // brand layer
   brand_layer = text_layer_create(GRect(0,cy-82,mx,my));
@@ -459,7 +460,7 @@ static void main_window_load(Window *window) {
   // battery layer
   battery_layer = layer_create(bounds);
   layer_set_update_proc(battery_layer, battery_update_proc);
-  layer_add_child(window_get_root_layer(window), battery_layer);
+  layer_add_child(window_layer, battery_layer);
   battery_callback(battery_state_service_peek());
 
   // time layers
@@ -511,14 +512,14 @@ static void main_window_load(Window *window) {
   bt_icon_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BT_ICON);
   bt_icon_layer = bitmap_layer_create(GRect(cx+30,cy+60,35,18));
   bitmap_layer_set_bitmap(bt_icon_layer, bt_icon_bitmap);
-  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bt_icon_layer));
+  layer_add_child(window_layer, bitmap_layer_get_layer(bt_icon_layer));
   bluetooth_callback(connection_service_peek_pebble_app_connection());
 
   // health layer
   steps_icon_bitmap = gbitmap_create_with_resource(RESOURCE_ID_STEPS_ICON);
   steps_icon_layer = bitmap_layer_create(GRect(cx-65,cy+60,35,18));
   bitmap_layer_set_bitmap(steps_icon_layer, steps_icon_bitmap);
-  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(steps_icon_layer));
+  layer_add_child(window_layer, bitmap_layer_get_layer(steps_icon_layer));
   layer_insert_below_sibling(bitmap_layer_get_layer(steps_icon_layer), canvas_layer);
   #if defined(PBL_HEALTH)
     if(health_service_events_subscribe(health_handler, NULL)) {
