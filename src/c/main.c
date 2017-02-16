@@ -390,7 +390,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   // draw dots
   graphics_context_set_fill_color(ctx, GColorBlack);
   graphics_fill_circle(ctx, GPoint(cx-58,cy-69), 4);
-  graphics_fill_circle(ctx, GPoint(cx+58,cy-69), 4);
+  graphics_fill_circle(ctx, GPoint(cx+57,cy-69), 4);
 
   // draw calendar  
   GRect hour_inside = GRect(cx-58,cy-10,46,30);

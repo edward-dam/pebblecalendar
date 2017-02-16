@@ -4,14 +4,14 @@
         "pebble-clay": "^1.0.0"
     },
     "keywords": [],
-    "name": "calendar-v3.0",
+    "name": "calendar-v3.1",
     "pebble": {
         "capabilities": [
             "location",
             "configurable",
             "health"
         ],
-        "displayName": "Calendar v3.0",
+        "displayName": "Calendar v3.1",
         "enableMultiJS": true,
         "messageKeys": [
             "LOCATION",
@@ -75,5 +75,5 @@
             "watchface": true
         }
     },
-    "version": "3.0.0"
+    "version": "3.10.0"
 }
