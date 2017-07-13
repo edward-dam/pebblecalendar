@@ -1,16 +1,16 @@
 # pebblecalendar
-###screenshots
+### screenshots
 
 ![basalt.png](/assets/basalt.png)
 ![basalt-health.png](/assets/basalt-health.png)
 ![basalt-sleep.png](/assets/basalt-sleep.png)
 ![basalt-sleep.png](/assets/basalt-bluetooth.png)
 
-###banner
+### banner
 
 ![banner.png](/assets/banner.png)
 
-###app store
+### app store
 
 https://apps.getpebble.com/applications/58927b1693254a93d00005b1
 
