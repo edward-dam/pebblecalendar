@@ -14,8 +14,9 @@
 
 https://apps.getpebble.com/applications/58927b1693254a93d00005b1
 
-###description
+### description
 <br />
+
 Simple calendar style watchface, includes:
  - current location
  - day of the week
@@ -25,7 +26,7 @@ Simple calendar style watchface, includes:
  - current temperature
  - steps data
  - sleep data
- - bluetooth symbol<br />
+ - bluetooth symbol
 <br />
 
 Options:
